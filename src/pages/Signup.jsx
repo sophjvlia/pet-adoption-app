@@ -12,6 +12,11 @@ export default function Signup() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [success, setSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,6 +47,54 @@ export default function Signup() {
     setLoading(true);
     setSuccess(false);
 
+    setFirstNameError('');
+    setLastNameError('');
+    setPhoneNumberError('');
+    setEmailError('');
+    setPasswordError('');
+
+    let valid = true;
+
+    if (!firstName) {
+      setFirstNameError('First Name is required.');
+      valid = false;
+    }
+
+    if (!lastName) {
+      setLastNameError('Last Name is required.');
+      valid = false;
+    }
+
+    if (!iti.telInput.value) {
+      setPhoneNumberError('Enter a valid phone number.');
+      valid = false;
+    }
+
+    if (!email) {
+      setEmailError('Email is required.');
+      valid = false;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
+    if (!password) {
+      setPasswordError('Password is required.');
+      valid = false;
+    } else if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+      valid = false;
+    } else if (!passwordRegex.test(password)) {
+      setPasswordError(
+        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.'
+      );
+      valid = false;
+    }
+
+    if (!valid) {
+      setLoading(false);
+      return;
+    }
+
     const countryCode = iti.getSelectedCountryData().dialCode;
     const countryCodeWithoutPlus = countryCode.replace('+', '');
     const phoneWithoutCountryCode = iti.telInput.value.replace(
@@ -68,6 +121,8 @@ export default function Signup() {
       );
       setSuccess(true);
       setShowModal(true);
+      setFirstName('');
+      setLastName('');
       setEmail('');
       setPassword('');
     } catch (error) {
@@ -94,10 +149,14 @@ export default function Signup() {
                     <FloatingLabel controlId="first_name" label="First Name">
                       <Form.Control
                         type="text"
-                        placeholder="first name"
+                        placeholder="First Name"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
+                        isInvalid={!!firstNameError}
                       />
+                      <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                        {firstNameError}
+                      </Form.Control.Feedback>
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -107,10 +166,14 @@ export default function Signup() {
                     <FloatingLabel controlId="last_name" label="Last Name">
                       <Form.Control
                         type="text"
-                        placeholder="last name"
+                        placeholder="Last Name"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
+                        isInvalid={!!lastNameError}
                       />
+                      <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                        {lastNameError}
+                      </Form.Control.Feedback>
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -118,7 +181,7 @@ export default function Signup() {
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <Form.Group className="h-100">
+                  <Form.Group style={{ height: "70%" }}>
                     <Form.Control
                       type="tel"
                       placeholder="Phone Number"
@@ -126,7 +189,11 @@ export default function Signup() {
                       defaultValue={phoneNumber}
                       onBlur={handlePhoneChange}
                       className="w-100 h-100"
+                      isInvalid={!!phoneNumberError}
                     />
+                    <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                      {phoneNumberError}
+                    </Form.Control.Feedback>
                   </Form.Group>
                 </div>
 
@@ -138,7 +205,11 @@ export default function Signup() {
                         placeholder="name@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        isInvalid={!!emailError}
                       />
+                      <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                        {emailError}
+                      </Form.Control.Feedback>
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -148,18 +219,18 @@ export default function Signup() {
                 <FloatingLabel controlId="password" label="Password">
                   <Form.Control
                     type="password"
-                    placeholder="password"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    isInvalid={!!passwordError}
                   />
+                  <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                    {passwordError}
+                  </Form.Control.Feedback>
                 </FloatingLabel>
               </Form.Group>
 
-              <Button
-                type="submit"
-                className="my-1 py-2 w-100"
-                disabled={loading}
-              >
+              <Button type="submit" className="my-1 py-2 w-100" disabled={loading}>
                 {loading ? <Spinner animation="border" size="sm" /> : 'Sign Up'}
               </Button>
 
@@ -167,6 +238,7 @@ export default function Signup() {
                 Already have an account? <Link to="/login">Log in here</Link>
               </p>
             </Form>
+
           </div>
         </Col>
       </Row>

@@ -18,18 +18,15 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // Clear previous errors
     setEmailError('');
     setPasswordError('');
     setMessage('');
 
-    // Validate inputs
     let valid = true;
 
     if (email === '') {
       setEmailError('Email is required.');
       valid = false;
-      console.log('error');
     }
 
     if (password === '') {
