@@ -4,6 +4,7 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import PetsListingPage from './pages/Pets'
 import AdminPetsView from './pages/AdminPetsView'
+import AdminApplicationsView from './pages/AdminApplicationsView'
 import './App.css';
 
 export function Layout() {
@@ -16,7 +17,8 @@ export function Layout() {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/pets">Pets</Nav.Link>
-              <Nav.Link href="/dashboard/pets">Admin</Nav.Link>
+              <Nav.Link href="/dashboard/pets">Admin Pets</Nav.Link>
+              <Nav.Link href="/dashboard/applications">Admin Applications</Nav.Link>
               <Nav.Link href="/login">Login</Nav.Link>
             </Nav>
           </Navbar.Collapse>
