@@ -7,7 +7,8 @@ import '../App.css'
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [message, setMessage] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,30 @@ export default function Login() {
   async function handleLogIn(e) {
     e.preventDefault();
     setLoading(true);
-    setSuccess(false);
+
+    // Clear previous errors
+    setEmailError('');
+    setPasswordError('');
+    setMessage('');
+
+    // Validate inputs
+    let valid = true;
+
+    if (email === '') {
+      setEmailError('Email is required.');
+      valid = false;
+      console.log('error');
+    }
+
+    if (password === '') {
+      setPasswordError('Password is required.');
+      valid = false;
+    }
+
+    if (!valid) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post('https://pet-adoption-api-v2.vercel.app/login', { email, password });
@@ -44,13 +68,19 @@ export default function Login() {
             <Form onSubmit={handleLogIn}>
               <Form.Group className="mb-3">
                 <FloatingLabel controlId="email" label="Email">
-                  <Form.Control type="email" placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <Form.Control type="email" placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} isInvalid={!!emailError} />
+                  <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                    {emailError}
+                  </Form.Control.Feedback>
                 </FloatingLabel>
               </Form.Group>
 
               <Form.Group className="mb-4">
                 <FloatingLabel controlId="password" label="Password">
-                  <Form.Control type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Form.Control type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} isInvalid={!!passwordError} />
+                  <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
+                    {passwordError}
+                  </Form.Control.Feedback>
                 </FloatingLabel>
               </Form.Group>
 
