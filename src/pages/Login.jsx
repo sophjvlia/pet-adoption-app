@@ -27,7 +27,6 @@ export default function Login() {
     if (email === '') {
       setEmailError('Email is required.');
       valid = false;
-      console.log('error');
     }
 
     if (password === '') {
