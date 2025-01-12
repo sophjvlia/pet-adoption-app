@@ -32,6 +32,7 @@ const AdminPetsView = () => {
     status: '',
   });
   const [errors, setErrors] = useState({});
+  const [breedsCache, setBreedsCache] = useState({});
 
 
   useEffect(() => {
@@ -55,6 +56,26 @@ const AdminPetsView = () => {
 
 
   useEffect(() => {
+    $("#petBreed").select2({
+      placeholder: "Select One",
+      allowClear: true,
+      width: "100%",
+    });
+
+    $("#petBreed").on("change", function () {
+      const selectedValue = $(this).val();
+      handleSpeciesChange({ target: { name: "breed", value: selectedValue } });
+    });
+
+    return () => {
+      if ($("#petBreed").data("select2")) {
+        $("#petBreed").select2("destroy");
+      }
+    };
+  }, [breeds]);
+
+
+  useEffect(() => {
     return () => {
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview); 
@@ -66,6 +87,7 @@ const AdminPetsView = () => {
   // Handle pet species change
   const handleSpeciesChange = async (e) => {
     const { name, value } = e.target;
+
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
@@ -111,6 +133,7 @@ const AdminPetsView = () => {
           });
 
           setBreeds(breeds);
+          console.log(breeds);
         }
       } catch (error) {
         console.error('Error fetching cat breeds:', error);
@@ -319,8 +342,6 @@ const AdminPetsView = () => {
                 <th>Breed</th>
                 <th>Gender</th>
                 <th>Age</th>
-                <th>Description</th>
-                <th>Image</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -331,14 +352,18 @@ const AdminPetsView = () => {
                   <td>{pet.id}</td>
                   <td>{pet.name}</td>
                   <td>{pet.species}</td>
-                  <td>{pet.breed}</td>
+                  <td>{pet.breed_name}</td>
                   <td>{pet.gender}</td>
                   <td>{pet.age}</td>
-                  <td>{pet.description}</td>
                   <td>
-                    <img width="50" src={pet.image} />
+                    {
+                      pet.status === '1' ? 'Active' :
+                      pet.status === '2' ? 'Pending Adoption' :
+                      pet.status === '3' ? 'Adopted' :
+                      pet.status === '0' ? 'Inactive' :
+                      'Unknown Status'
+                    }
                   </td>
-                  <td>{pet.status}</td>
                   <td>
                     <Button
                       variant="info"
@@ -388,20 +413,22 @@ const AdminPetsView = () => {
               </Form.Select>
               {errors.species && <div className="text-danger">{errors.species}</div>}
             </Form.Group>
-            <Form.Group controlId="petBreed" className="mb-3">
-              <Form.Label>Breed</Form.Label>
-              <Form.Select name="breed" onChange={handleInputChange}>
+            <div className="mb-3">
+              <label htmlFor="petBreed">Breed</label>
+              <select id="petBreed" name="breed" className="form-control">
                 <option value="">Select One</option>
-                {breeds && breeds.length > 0 && (
-                  breeds.map((breed) => (
-                    <option key={breed.id} value={breed.id}>
-                      {breed.name}
-                    </option>
-                  ))
-                )}
-              </Form.Select>
+                  {breeds && breeds.length > 0 ? (
+                    breeds.map((breed) => (
+                      <option key={breed.id} value={breed.id}>
+                        {breed.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>No breeds available</option>
+                  )}
+              </select>
               {errors.breed && <div className="text-danger">{errors.breed}</div>}
-            </Form.Group>
+            </div>
             <Form.Group controlId="petGender" className="mb-3">
               <Form.Label>Gender</Form.Label>
               <Form.Select name="gender" onChange={handleInputChange}>
@@ -492,6 +519,20 @@ const AdminPetsView = () => {
         </Modal.Header>
         <Modal.Body>
           <Form>
+            {formData.image && (
+              <div className="d-flex justify-content-center my-2">
+                <img
+                  src={formData.image}
+                  alt="Pet"
+                  style={{
+                    width: '300px',
+                    height: 'auto',
+                    objectFit: 'cover',
+                    borderRadius: '10px'
+                  }}
+                />
+              </div>
+            )}
             <Form.Group controlId="petName" className="mb-3">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -564,17 +605,6 @@ const AdminPetsView = () => {
             </Form.Group>
             <Form.Group controlId="petImage" className="mb-3">
               <Form.Label>Image</Form.Label>
-              {formData.image && (
-                <img
-                  src={formData.image}
-                  alt="Pet"
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover',
-                  }}
-                />
-              )}
               <Form.Control
                 type="file"
                 name="image"
