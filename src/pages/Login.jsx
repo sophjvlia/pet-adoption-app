@@ -18,18 +18,15 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    // Clear previous errors
     setEmailError('');
     setPasswordError('');
     setMessage('');
 
-    // Validate inputs
     let valid = true;
 
     if (email === '') {
       setEmailError('Email is required.');
       valid = false;
-      console.log('error');
     }
 
     if (password === '') {
@@ -42,19 +39,19 @@ export default function Login() {
       return;
     }
 
-    // try {
-    //   const response = await axios.post('https://pet-adoption-api-v2.vercel.app/login', { email, password });
-    //   const { user, token } = response.data;
-    //   localStorage.setItem('user_id', user.id);
-    //   localStorage.setItem('token', token);
-    //   navigate('/pets');
-    // } catch (error) {
-    //   setMessage(error.response.data.error);
-    //   setShowModal(true);
-    //   console.error('Error during login:', error);
-    // } finally {
-    //   setLoading(false);
-    // }
+    try {
+      const response = await axios.post('https://pet-adoption-api-v2.vercel.app/login', { email, password });
+      const { user, token } = response.data;
+      localStorage.setItem('user_id', user.id);
+      localStorage.setItem('token', token);
+      navigate('/pets');
+    } catch (error) {
+      setMessage(error.response.data.error);
+      setShowModal(true);
+      console.error('Error during login:', error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

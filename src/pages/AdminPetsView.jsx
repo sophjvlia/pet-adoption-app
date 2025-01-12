@@ -13,32 +13,12 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 
 const AdminPetsView = () => {
-  useEffect(() => {
-    const fetchPets = async () => {
-      try {
-        const response = await axios.get(
-          'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/pets'
-        );
-        const responseData = response.data.data;
-
-        if (responseData) {
-          // Use spread operator to immutably update state
-          setPets(responseData);
-          console.log(responseData);
-        }
-      } catch (error) {
-        console.error('Error fetching pet data:', error);
-      }
-    };
-
-    fetchPets(); // Call the async function
-  }, []);
 
   const [pets, setPets] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const [selectedPet, setSelectedPet] = useState(null);
-  const [selectedBreed, setSelectedBreed] = useState('');
   const [breeds, setBreeds] = useState([]);
   const [status, setStatus] = useState('');
   const [formData, setFormData] = useState({
@@ -51,6 +31,37 @@ const AdminPetsView = () => {
     image: '',
     status: '',
   });
+  const [errors, setErrors] = useState({});
+
+
+  useEffect(() => {
+    const fetchPets = async () => {
+      try {
+        const response = await axios.get(
+          'https://pet-adoption-api-v2.vercel.app/pets'
+        );
+        const responseData = response.data.data;
+
+        if (responseData) {
+          setPets(responseData);
+        }
+      } catch (error) {
+        console.error('Error fetching pet data:', error);
+      }
+    };
+
+    fetchPets(); 
+  }, []);
+
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview); 
+      }
+    };
+  }, [imagePreview]);
+
 
   // Handle pet species change
   const handleSpeciesChange = async (e) => {
@@ -63,7 +74,7 @@ const AdminPetsView = () => {
     if (value.trim().toLowerCase() == 'dog') {
       try {
         const response = await axios.get(
-          'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/dog/breeds'
+          'https://pet-adoption-api-v2.vercel.app/dog/breeds'
         );
         const responseData = response.data.data;
 
@@ -85,7 +96,7 @@ const AdminPetsView = () => {
     } else if (value.trim().toLowerCase() == 'cat') {
       try {
         const response = await axios.get(
-          'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/cat/breeds'
+          'https://pet-adoption-api-v2.vercel.app/cat/breeds'
         );
         const responseData = response.data.data;
 
@@ -107,6 +118,7 @@ const AdminPetsView = () => {
     }
   };
 
+
   // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -114,16 +126,26 @@ const AdminPetsView = () => {
       ...prevState,
       [name]: value,
     }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: '',
+    }));
   };
 
+
+  // Handle image file upload and generate temporary URL
   const handleFileChange = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
     console.log(file);
     setFormData({ ...formData, ['image']: file });
+    setImagePreview(URL.createObjectURL(file));
   };
 
+
+  // Handle pet status change
   const handleStatusChange = (e) => {
+    console.log(e.target);
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -131,11 +153,34 @@ const AdminPetsView = () => {
     }));
   };
 
+
+  // Validate form fields
+  const validateFields = () => {
+    const newErrors = {};
+    if (!formData.name) newErrors.name = 'Name is required.';
+    if (!formData.species) newErrors.species = 'Species is required.';
+    if (!formData.breed) newErrors.breed = 'Breed is required.';
+    if (!formData.gender) newErrors.gender = 'Gender is required.';
+    if (!formData.age) newErrors.age = 'Age is required.';
+    if (!formData.description) newErrors.description = 'Description is required.';
+    if (!formData.image) newErrors.image = 'Image is required.';
+    if (!formData.status) newErrors.status = 'Status is required.';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; 
+  };
+
+
   // Add new pet
   const handleAddPet = async () => {
+
+    if (!validateFields()) {
+      return; 
+    }
+
     try {
       const response = await axios.post(
-        'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/pets',
+        'https://pet-adoption-api-v2.vercel.app/pets',
         formData,
         {
           headers: {
@@ -143,13 +188,10 @@ const AdminPetsView = () => {
           },
         }
       );
-      console.log(response);
 
-      // Add the new pet to the local state only after a successful response
-      setPets([...pets, { ...response.data, id: pets.length + 1 }]); // Use the server response to populate the pet list
+      setPets([...pets, { ...response.data, id: pets.length + 1 }]);
       setShowAddModal(false);
 
-      // Reset the form data
       setFormData({
         name: '',
         species: '',
@@ -169,7 +211,7 @@ const AdminPetsView = () => {
   const handleEditPet = async () => {
     try {
       const response = await axios.put(
-        'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/pets',
+        'https://pet-adoption-api-v2.vercel.app/pets',
         formData,
         {
           headers: {
@@ -208,7 +250,7 @@ const AdminPetsView = () => {
   const handleDeletePet = async (id) => {
     if (window.confirm('Are you sure you want to delete this pet?')) {
       try {
-        const response = await axios.delete(`https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/pets/${id}`);
+        const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${id}`);
         console.log(response);
   
         // Reset the form data
@@ -252,7 +294,7 @@ const AdminPetsView = () => {
       {/* Title */}
       <Row className="mt-5 py-5">
         <Col>
-          <h2 className="text-center">Admin Pets Management</h2>
+          <h2 className="text-center">Pets Management</h2>
         </Col>
       </Row>
 
@@ -335,6 +377,7 @@ const AdminPetsView = () => {
                 value={formData.name}
                 onChange={handleInputChange}
               />
+              {errors.name && <div className="text-danger">{errors.name}</div>}
             </Form.Group>
             <Form.Group controlId="petSpecies" className="mb-3">
               <Form.Label>Species</Form.Label>
@@ -343,20 +386,22 @@ const AdminPetsView = () => {
                 <option value="Dog">Dog</option>
                 <option value="Cat">Cat</option>
               </Form.Select>
+              {errors.species && <div className="text-danger">{errors.species}</div>}
             </Form.Group>
-            {breeds && breeds.length > 0 && (
-              <Form.Group controlId="petBreed" className="mb-3">
-                <Form.Label>Breed</Form.Label>
-                <Form.Select name="breed" onChange={handleInputChange}>
-                  <option value="">Select One</option>
-                  {breeds.map((breed) => (
+            <Form.Group controlId="petBreed" className="mb-3">
+              <Form.Label>Breed</Form.Label>
+              <Form.Select name="breed" onChange={handleInputChange}>
+                <option value="">Select One</option>
+                {breeds && breeds.length > 0 && (
+                  breeds.map((breed) => (
                     <option key={breed.id} value={breed.id}>
                       {breed.name}
                     </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            )}
+                  ))
+                )}
+              </Form.Select>
+              {errors.breed && <div className="text-danger">{errors.breed}</div>}
+            </Form.Group>
             <Form.Group controlId="petGender" className="mb-3">
               <Form.Label>Gender</Form.Label>
               <Form.Select name="gender" onChange={handleInputChange}>
@@ -364,6 +409,7 @@ const AdminPetsView = () => {
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </Form.Select>
+              {errors.gender && <div className="text-danger">{errors.gender}</div>}
             </Form.Group>
             <Form.Group controlId="petAge" className="mb-3">
               <Form.Label>Age</Form.Label>
@@ -374,6 +420,7 @@ const AdminPetsView = () => {
                 value={formData.age}
                 onChange={handleInputChange}
               />
+              {errors.age && <div className="text-danger">{errors.age}</div>}
             </Form.Group>
             <Form.Group controlId="petDescription" className="mb-3">
               <Form.Label>Description</Form.Label>
@@ -385,7 +432,17 @@ const AdminPetsView = () => {
                 value={formData.description}
                 onChange={handleInputChange}
               />
+              {errors.description && <div className="text-danger">{errors.description}</div>}
             </Form.Group>
+            {imagePreview && (
+              <div className="my-3 mb-2 d-flex justify-content-center">
+                <img
+                  src={imagePreview}
+                  alt="Uploaded Preview"
+                  style={{ width: '100%', maxWidth: '300px', borderRadius: '10px' }}
+                />
+              </div>
+            )}
             <Form.Group controlId="petImage" className="mb-3">
               <Form.Label>Image</Form.Label>
               <Form.Control
@@ -393,15 +450,16 @@ const AdminPetsView = () => {
                 name="image"
                 onChange={handleFileChange}
               />
+              {errors.image && <div className="text-danger">{errors.image}</div>}
             </Form.Group>
             <Form.Group controlId="petStatus" className="mb-3">
               <Form.Label>Status</Form.Label>
               <div className="d-flex justify-content-evenly align-items-center">
                 {[
-                  { label: 'Active', value: 1 },
-                  { label: 'Pending Adoption', value: 2 },
-                  { label: 'Adopted', value: 3 },
-                  { label: 'Inactive', value: 0 },
+                  { label: 'Active', value: '1' },
+                  { label: 'Pending Adoption', value: '2' },
+                  { label: 'Adopted', value: '3' },
+                  { label: 'Inactive', value: '0' },
                 ].map((option) => (
                   <Form.Check
                     key={option.value}
@@ -409,11 +467,11 @@ const AdminPetsView = () => {
                     label={option.label}
                     value={option.value}
                     name="status"
-                    checked={status === option.value}
                     onChange={handleStatusChange}
                   />
                 ))}
               </div>
+              {errors.status && <div className="text-danger">{errors.status}</div>}
             </Form.Group>
           </Form>
         </Modal.Body>
