@@ -12,7 +12,7 @@ import {
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 
-const AdminPetsView = () => {
+const AdminApplicationsView = () => {
 
   return (
     <Container>
@@ -80,4 +80,4 @@ const AdminPetsView = () => {
   );
 };
 
-export default AdminPetsView;
+export default AdminApplicationsView;
