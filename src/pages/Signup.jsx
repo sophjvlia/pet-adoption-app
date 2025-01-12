@@ -47,57 +47,6 @@ export default function Signup() {
     setLoading(true);
     setSuccess(false);
 
-<<<<<<< sophjvlia/patch-90513
-    setFirstNameError('');
-    setLastNameError('');
-    setPhoneNumberError('');
-    setEmailError('');
-    setPasswordError('');
-    setMessage('');
-
-    let valid = true;
-
-    if (!firstName) {
-      setFirstNameError('First Name is required.');
-      valid = false;
-    }
-
-    if (!lastName) {
-      setLastNameError('Last Name is required.');
-      valid = false;
-    }
-
-    if (!iti.telInput.value) {
-      setPhoneNumberError('Enter a valid phone number.');
-      valid = false;
-    }
-
-    if (!email) {
-      setEmailError('Email is required.');
-      valid = false;
-    }
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-
-    if (!password) {
-      setPasswordError('Password is required.');
-      valid = false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
-      valid = false;
-    } else if (!passwordRegex.test(password)) {
-      setPasswordError(
-        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.'
-      );
-      valid = false;
-    }
-
-    if (!valid) {
-      setLoading(false);
-      return;
-    }
-
-=======
     setFirstNameError('');
     setLastNameError('');
     setPhoneNumberError('');
@@ -146,7 +95,6 @@ export default function Signup() {
       return;
     }
 
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
     const countryCode = iti.getSelectedCountryData().dialCode;
     const countryCodeWithoutPlus = countryCode.replace('+', '');
     const phoneWithoutCountryCode = iti.telInput.value.replace(
@@ -206,15 +154,9 @@ export default function Signup() {
                         onChange={(e) => setFirstName(e.target.value)}
                         isInvalid={!!firstNameError}
                       />
-<<<<<<< sophjvlia/patch-90513
-                      <Form.Control.Feedback type="invalid">
-                        {firstNameError}
-                      </Form.Control.Feedback>
-=======
                       <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                         {firstNameError}
                       </Form.Control.Feedback>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -229,15 +171,9 @@ export default function Signup() {
                         onChange={(e) => setLastName(e.target.value)}
                         isInvalid={!!lastNameError}
                       />
-<<<<<<< sophjvlia/patch-90513
-                      <Form.Control.Feedback type="invalid">
-                        {lastNameError}
-                      </Form.Control.Feedback>
-=======
                       <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                         {lastNameError}
                       </Form.Control.Feedback>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -245,34 +181,19 @@ export default function Signup() {
 
               <div className="row">
                 <div className="col-md-6 mb-3">
-<<<<<<< sophjvlia/patch-90513
-                  <Form.Group>
-=======
                   <Form.Group style={{ height: "70%" }}>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                     <Form.Control
                       type="tel"
                       placeholder="Phone Number"
                       ref={phoneInputRef}
                       defaultValue={phoneNumber}
                       onBlur={handlePhoneChange}
-<<<<<<< sophjvlia/patch-90513
-                      className="w-100"
-                      isInvalid={!!phoneNumberError}
-=======
                       className="w-100 h-100"
                       isInvalid={!!phoneNumberError}
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                     />
-<<<<<<< sophjvlia/patch-90513
-                    <Form.Control.Feedback type="invalid">
-                      {phoneNumberError}
-                    </Form.Control.Feedback>
-=======
                     <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                       {phoneNumberError}
                     </Form.Control.Feedback>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                   </Form.Group>
                 </div>
 
@@ -286,15 +207,9 @@ export default function Signup() {
                         onChange={(e) => setEmail(e.target.value)}
                         isInvalid={!!emailError}
                       />
-<<<<<<< sophjvlia/patch-90513
-                      <Form.Control.Feedback type="invalid">
-                        {emailError}
-                      </Form.Control.Feedback>
-=======
                       <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                         {emailError}
                       </Form.Control.Feedback>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                     </FloatingLabel>
                   </Form.Group>
                 </div>
@@ -309,15 +224,9 @@ export default function Signup() {
                     onChange={(e) => setPassword(e.target.value)}
                     isInvalid={!!passwordError}
                   />
-<<<<<<< sophjvlia/patch-90513
-                  <Form.Control.Feedback type="invalid">
-                    {passwordError}
-                  </Form.Control.Feedback>
-=======
                   <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                     {passwordError}
                   </Form.Control.Feedback>
->>>>>>> 4d09489daa95b00ed52e1ab4153ba467eabf191d
                 </FloatingLabel>
               </Form.Group>
 
