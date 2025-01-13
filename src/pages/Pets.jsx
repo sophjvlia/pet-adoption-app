@@ -13,7 +13,7 @@ const PetsListingPage = () => {
     const fetchPets = async () => {
       try {
         const response = await axios.get(
-          'https://04f998f0-ccf3-4018-b568-26432c01ec37-00-27ggrvg7746p7.sisko.replit.dev/pets'
+          'https://pet-adoption-api-v2.vercel.app/pets'
         );
         const responseData = response.data.data;
 
@@ -30,17 +30,21 @@ const PetsListingPage = () => {
     fetchPets();
   }, []);
 
-  // Filter pets based on user inputs
   useEffect(() => {
-    const { species, breed } = filters;
+    const { species, breed, gender, age, status, name } = filters;
     const filtered = pets.filter(
       (pet) =>
         (species ? pet.species === species : true) &&
-        (breed ? pet.breed.toLowerCase().includes(breed.toLowerCase()) : true)
+        (breed ? pet.breed.toLowerCase().includes(breed.toLowerCase()) : true) &&
+        (gender ? pet.gender === gender : true) &&
+        (age ? parseInt(pet.age, 10) === parseInt(age, 10) : true) &&
+        (status ? pet.status === status : true) &&
+        (name ? pet.name.toLowerCase().includes(name.toLowerCase()) : true)
     );
     setFilteredPets(filtered);
-    setCurrentPage(1); // Reset to first page
+    setCurrentPage(1);
   }, [filters, pets]);
+  
 
   // Pagination logic
   const indexOfLastPet = currentPage * itemsPerPage;
@@ -92,7 +96,6 @@ const PetsListingPage = () => {
                 <option value="">All</option>
                 <option value="Dog">Dog</option>
                 <option value="Cat">Cat</option>
-                {/* Add more species as needed */}
               </Form.Control>
             </Form.Group>
           </Col>
@@ -104,6 +107,60 @@ const PetsListingPage = () => {
                 name="breed"
                 placeholder="Search by breed"
                 value={filters.breed}
+                onChange={handleFilterChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="gender">
+              <Form.Label>Gender</Form.Label>
+              <Form.Control
+                as="select"
+                name="gender"
+                value={filters.gender}
+                onChange={handleFilterChange}
+              >
+                <option value="">All</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </Form.Control>
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="age">
+              <Form.Label>Age</Form.Label>
+              <Form.Control
+                type="number"
+                name="age"
+                placeholder="Search by age"
+                value={filters.age}
+                onChange={handleFilterChange}
+              />
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="status">
+              <Form.Label>Status</Form.Label>
+              <Form.Control
+                as="select"
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+              >
+                <option value="">All</option>
+                <option value="1">Available</option>
+                <option value="0">Unavailable</option>
+              </Form.Control>
+            </Form.Group>
+          </Col>
+          <Col md={6}>
+            <Form.Group controlId="name">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                placeholder="Search by name"
+                value={filters.name}
                 onChange={handleFilterChange}
               />
             </Form.Group>
