@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 import Signup from './pages/Signup'
 import Login from './pages/Login'
 import PetsListingPage from './pages/Pets'
+import PetDetailsPage from './pages/PetDetails'
 import AdminPetsView from './pages/AdminPetsView'
 import AdminApplicationsView from './pages/AdminApplicationsView'
 import './App.css';
@@ -37,7 +38,9 @@ function App() {
           <Route path="signup" element={<Signup/>} />
           <Route path="login" element={<Login/>} />
           <Route path="pets" element={<PetsListingPage/>} />
+          <Route path="pet-details/:id" element={<PetDetailsPage/>} />
           <Route path="dashboard/pets" element={<AdminPetsView/>} />
+          <Route path="dashboard/applications" element={<AdminApplicationsView/>} />
         </Route>
       </Routes>
     </BrowserRouter>
