@@ -22,7 +22,6 @@ const PetsListingPage = () => {
           // Use spread operator to immutably update state
           setPets(responseData);
           setFilteredPets(responseData);
-          console.log(responseData);
         }
       } catch (error) {
         console.error('Error fetching pet data:', error);

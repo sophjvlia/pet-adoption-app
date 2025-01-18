@@ -7,7 +7,7 @@ import {
   Button,
   Modal,
   Form,
-  InputGroup,
+  Pagination
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
@@ -32,8 +32,12 @@ const AdminPetsView = () => {
     status: '',
   });
   const [errors, setErrors] = useState({});
-  const [breedsCache, setBreedsCache] = useState({});
 
+  // Pagination
+  const [filteredPets, setFilteredPets] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
+  const [filters, setFilters] = useState({ species: '', breed: '' });
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -45,6 +49,7 @@ const AdminPetsView = () => {
 
         if (responseData) {
           setPets(responseData);
+          setFilteredPets(responseData);
         }
       } catch (error) {
         console.error('Error fetching pet data:', error);
@@ -56,32 +61,26 @@ const AdminPetsView = () => {
 
 
   useEffect(() => {
-    $("#petBreed").select2({
-      placeholder: "Select One",
-      allowClear: true,
-      width: "100%",
-    });
-
-    $("#petBreed").on("change", function () {
-      const selectedValue = $(this).val();
-      handleSpeciesChange({ target: { name: "breed", value: selectedValue } });
-    });
-
-    return () => {
-      if ($("#petBreed").data("select2")) {
-        $("#petBreed").select2("destroy");
-      }
-    };
-  }, [breeds]);
-
-
-  useEffect(() => {
     return () => {
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview); 
       }
     };
   }, [imagePreview]);
+
+
+  // Pagination logic
+  const indexOfLastPet = currentPage * itemsPerPage;
+  const indexOfFirstPet = indexOfLastPet - itemsPerPage;
+  const currentPets = filteredPets.slice(indexOfFirstPet, indexOfLastPet);
+  const totalPages = Math.ceil(filteredPets.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
+  };
 
 
   // Handle pet species change
@@ -93,7 +92,12 @@ const AdminPetsView = () => {
       [name]: value,
     }));
 
-    if (value.trim().toLowerCase() == 'dog') {
+    await fetchBreedsBySpecies(value);
+  };
+
+
+  const fetchBreedsBySpecies = async (species) => {
+    if (species.trim().toLowerCase() == 'dog') {
       try {
         const response = await axios.get(
           'https://pet-adoption-api-v2.vercel.app/dog/breeds'
@@ -115,7 +119,7 @@ const AdminPetsView = () => {
       } catch (error) {
         console.error('Error fetching dog breeds:', error);
       }
-    } else if (value.trim().toLowerCase() == 'cat') {
+    } else if (species.trim().toLowerCase() == 'cat') {
       try {
         const response = await axios.get(
           'https://pet-adoption-api-v2.vercel.app/cat/breeds'
@@ -133,7 +137,6 @@ const AdminPetsView = () => {
           });
 
           setBreeds(breeds);
-          console.log(breeds);
         }
       } catch (error) {
         console.error('Error fetching cat breeds:', error);
@@ -234,7 +237,7 @@ const AdminPetsView = () => {
   const handleEditPet = async () => {
     try {
       const response = await axios.put(
-        'https://pet-adoption-api-v2.vercel.app/pets',
+        `https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`,
         formData,
         {
           headers: {
@@ -296,19 +299,22 @@ const AdminPetsView = () => {
   };
 
   // Open edit modal and prefill form
-  const handleEditClick = (pet) => {
-    console.log(pet);
+  const handleEditClick = async (pet) => {
     setSelectedPet(pet);
+
+    await fetchBreedsBySpecies(pet.species);
+
     setFormData({
       name: pet.name,
       species: pet.species,
-      breed: pet.breed,
+      breed: pet.breed_id,
       gender: pet.gender,
       age: pet.age,
       description: pet.description,
       image: pet.image_url,
       status: pet.status,
     });
+
     setShowEditModal(true);
   };
 
@@ -347,9 +353,9 @@ const AdminPetsView = () => {
               </tr>
             </thead>
             <tbody>
-              {pets.map((pet) => (
+              {pets.map((pet, index) => (
                 <tr key={pet.id}>
-                  <td>{pet.id}</td>
+                  <td>{index + 1}</td>
                   <td>{pet.name}</td>
                   <td>{pet.species}</td>
                   <td>{pet.breed_name}</td>
@@ -413,11 +419,11 @@ const AdminPetsView = () => {
               </Form.Select>
               {errors.species && <div className="text-danger">{errors.species}</div>}
             </Form.Group>
-            <div className="mb-3">
-              <label htmlFor="petBreed">Breed</label>
-              <select id="petBreed" name="breed" className="form-control">
+            <Form.Group controlId="petBreed" className="mb-3">
+              <Form.Label>Breed</Form.Label>
+              <Form.Select name="breed" onChange={handleInputChange}>
                 <option value="">Select One</option>
-                  {breeds && breeds.length > 0 ? (
+                {breeds && breeds.length > 0 ? (
                     breeds.map((breed) => (
                       <option key={breed.id} value={breed.id}>
                         {breed.name}
@@ -426,9 +432,9 @@ const AdminPetsView = () => {
                   ) : (
                     <option value="" disabled>No breeds available</option>
                   )}
-              </select>
+              </Form.Select>
               {errors.breed && <div className="text-danger">{errors.breed}</div>}
-            </div>
+            </Form.Group>
             <Form.Group controlId="petGender" className="mb-3">
               <Form.Label>Gender</Form.Label>
               <Form.Select name="gender" onChange={handleInputChange}>
@@ -643,6 +649,23 @@ const AdminPetsView = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Pagination */}
+      <Row>
+        <Col>
+          <Pagination className="justify-content-center">
+            {[...Array(totalPages).keys()].map((pageNumber) => (
+              <Pagination.Item
+                key={pageNumber + 1}
+                active={currentPage === pageNumber + 1}
+                onClick={() => handlePageChange(pageNumber + 1)}
+              >
+                {pageNumber + 1}
+              </Pagination.Item>
+            ))}
+          </Pagination>
+        </Col>
+      </Row>
     </Container>
   );
 };
