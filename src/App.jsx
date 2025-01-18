@@ -38,7 +38,7 @@ function App() {
           <Route path="signup" element={<Signup/>} />
           <Route path="login" element={<Login/>} />
           <Route path="pets" element={<PetsListingPage/>} />
-          <Route path="pet-details/:id" element={<PetDetailsPage/>} />
+          <Route path="pets/:id" element={<PetDetailsPage/>} />
           <Route path="dashboard/pets" element={<AdminPetsView/>} />
           <Route path="dashboard/applications" element={<AdminApplicationsView/>} />
         </Route>

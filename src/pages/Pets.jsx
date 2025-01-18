@@ -60,20 +60,6 @@ const PetsListingPage = () => {
 
   return (
     <div>
-      {/* Banner */}
-      <div
-        style={{
-          background: "url('/path-to-banner.jpg') no-repeat center/cover",
-          height: '40vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          color: '#fff',
-        }}
-      >
-        <h1>Find Your New Best Friend</h1>
-      </div>
-
       <Container className="mt-4">
         {/* Title */}
         <Row>
@@ -173,7 +159,7 @@ const PetsListingPage = () => {
             currentPets.map((pet) => (
               <Col md={4} sm={6} key={pet.id} className="mb-4">
                 <Card>
-                  <Link to={`pet-details/${pet.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Link to={`${pet.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Card.Img
                       variant="top"
                       src={pet.image_url}
