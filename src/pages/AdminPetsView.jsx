@@ -104,7 +104,6 @@ const AdminPetsView = () => {
     const { name, value } = e.target;
     setFilters((prevFilters) => {
       const updatedFilters = { ...prevFilters, [name]: value };
-      console.log('Updated Filters:', updatedFilters); // Debugging
       return updatedFilters;
     });
   };
@@ -191,7 +190,6 @@ const AdminPetsView = () => {
   const handleFileChange = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
-    console.log(file);
     setFormData({ ...formData, ['image']: file });
     setImagePreview(URL.createObjectURL(file));
   };
@@ -199,7 +197,6 @@ const AdminPetsView = () => {
 
   // Handle pet status change
   const handleStatusChange = (e) => {
-    console.log(e.target);
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -273,7 +270,6 @@ const AdminPetsView = () => {
           },
         }
       );
-      console.log(response);
 
       setShowEditModal(false);
 
@@ -305,7 +301,6 @@ const AdminPetsView = () => {
     if (window.confirm('Are you sure you want to delete this pet?')) {
       try {
         const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${id}`);
-        console.log(response);
   
         // Reset the form data
         setFormData({
@@ -527,7 +522,13 @@ const AdminPetsView = () => {
                   </td>
                 </tr>
               ))
-            ) : null}
+            ) : (
+              <tr>
+                <td colSpan="8" className="text-center">
+                  No pets found
+                </td>
+              </tr>
+            )}
             </tbody>
           </Table>
         </Col>
