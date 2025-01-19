@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
+import Accordion from 'react-bootstrap/Accordion';
 
 const AdminPetsView = () => {
 
@@ -32,12 +33,18 @@ const AdminPetsView = () => {
     status: '',
   });
   const [errors, setErrors] = useState({});
-
   // Pagination
   const [filteredPets, setFilteredPets] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
-  const [filters, setFilters] = useState({ species: '', breed: '' });
+  const [filters, setFilters] = useState({
+    species: '',     
+    breed: '', 
+    gender: '',
+    age: '',            
+    status: '',          
+    name: '',           
+  });
 
   useEffect(() => {
     const fetchPets = async () => {
@@ -61,6 +68,22 @@ const AdminPetsView = () => {
 
 
   useEffect(() => {
+    const { species, breed, gender, age, status, name } = filters;
+    const filtered = pets.filter(
+      (pet) =>
+        (species ? pet.species === species : true) &&
+        (breed ? pet.breed_name.toLowerCase().includes(breed.toLowerCase()) : true) &&
+        (gender ? pet.gender === gender : true) &&
+        (age ? parseInt(pet.age, 10) === parseInt(age, 10) : true) &&
+        (status ? pet.status === status : true) &&
+        (name ? pet.name.toLowerCase().includes(name.toLowerCase()) : true)
+    );
+    setFilteredPets(filtered);
+    setCurrentPage(1);
+  }, [filters, pets]);
+
+
+  useEffect(() => {
     return () => {
       if (imagePreview) {
         URL.revokeObjectURL(imagePreview); 
@@ -79,8 +102,13 @@ const AdminPetsView = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters({ ...filters, [name]: value });
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [name]: value };
+      console.log('Updated Filters:', updatedFilters); // Debugging
+      return updatedFilters;
+    });
   };
+  
 
 
   // Handle pet species change
@@ -327,10 +355,114 @@ const AdminPetsView = () => {
         </Col>
       </Row>
 
-      {/* Add Pet Button */}
-      <Row className="mb-3">
-        <Col className="text-end">
-          <Button variant="success" onClick={() => setShowAddModal(true)}>
+      {/* Filter Section */}
+      <Row className="align-items-center mb-3">
+        <Col>
+          <Accordion>
+            {/* Accordion Header */}
+            <Accordion.Item eventKey="0">
+              <Accordion.Header>
+                Filters
+              </Accordion.Header>
+
+              {/* Accordion Body */}
+              <Accordion.Body>
+                <Row>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="species">
+                      <Form.Label>Species</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="species"
+                        value={filters.species}
+                        onChange={handleFilterChange}
+                      >
+                        <option value="">All</option>
+                        <option value="Dog">Dog</option>
+                        <option value="Cat">Cat</option>
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="breed">
+                      <Form.Label>Breed</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="breed"
+                        placeholder="Search by breed"
+                        value={filters.breed}
+                        onChange={handleFilterChange}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="gender">
+                      <Form.Label>Gender</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="gender"
+                        value={filters.gender}
+                        onChange={handleFilterChange}
+                      >
+                        <option value="">All</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="age">
+                      <Form.Label>Age</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="age"
+                        placeholder="Search by age"
+                        value={filters.age}
+                        onChange={handleFilterChange}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="status">
+                      <Form.Label>Status</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="status"
+                        value={filters.status}
+                        onChange={handleFilterChange}
+                      >
+                        <option value="">All</option>
+                        <option value="1">Active</option>
+                        <option value="2">Pending Adoption</option>
+                        <option value="3">Adopted</option>
+                        <option value="0">Inactive</option>
+                      </Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={4} className="mb-2">
+                    <Form.Group controlId="name">
+                      <Form.Label>Name</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        placeholder="Search by name"
+                        value={filters.name}
+                        onChange={handleFilterChange}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Accordion.Body>
+            </Accordion.Item>
+          </Accordion>
+        </Col>
+        <Col sm={2} className="d-flex justify-content-start">
+          <Button
+            variant="success"
+            size="sm"
+            className="mt-3 mt-md-0 ms-md-3 btn btn-success btn-sm"
+            onClick={() => setShowAddModal(true)}
+          >
             Add New Pet
           </Button>
         </Col>
@@ -353,7 +485,8 @@ const AdminPetsView = () => {
               </tr>
             </thead>
             <tbody>
-              {pets.map((pet, index) => (
+            {currentPets.length > 0 ? (
+              currentPets.map((pet, index) => (
                 <tr key={pet.id}>
                   <td>{index + 1}</td>
                   <td>{pet.name}</td>
@@ -362,18 +495,25 @@ const AdminPetsView = () => {
                   <td>{pet.gender}</td>
                   <td>{pet.age}</td>
                   <td>
-                    {
-                      pet.status === '1' ? 'Active' :
-                      pet.status === '2' ? 'Pending Adoption' :
-                      pet.status === '3' ? 'Adopted' :
-                      pet.status === '0' ? 'Inactive' :
-                      'Unknown Status'
-                    }
+                    {(() => {
+                      switch (pet.status) {
+                        case '1':
+                          return 'Active';
+                        case '2':
+                          return 'Pending Adoption';
+                        case '3':
+                          return 'Adopted';
+                        case '0':
+                          return 'Inactive';
+                        default:
+                          return 'Unknown Status';
+                      }
+                    })()}
                   </td>
                   <td>
                     <Button
                       variant="info"
-                      className="me-2"
+                      className="me-md-2 mb-2 mb-md-0 btn btn-info"
                       onClick={() => handleEditClick(pet)}
                     >
                       <FaEdit />
@@ -386,7 +526,8 @@ const AdminPetsView = () => {
                     </Button>
                   </td>
                 </tr>
-              ))}
+              ))
+            ) : null}
             </tbody>
           </Table>
         </Col>
