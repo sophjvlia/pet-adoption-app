@@ -623,6 +623,7 @@ const AdminPetsView = () => {
               <Form.Control
                 type="file"
                 name="image"
+                accept="image/*"
                 onChange={handleFileChange}
               />
               {errors.image && <div className="text-danger">{errors.image}</div>}
@@ -756,6 +757,7 @@ const AdminPetsView = () => {
               <Form.Control
                 type="file"
                 name="image"
+                accept="image/*"
                 onChange={handleFileChange}
               />
             </Form.Group>
