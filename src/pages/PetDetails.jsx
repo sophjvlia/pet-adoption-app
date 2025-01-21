@@ -59,7 +59,6 @@ const PetDetail = () => {
   };
 
   const handleSubmit = async () => {
-    console.log('submit');
 
     if (userId) {
       const apiData = {
@@ -258,6 +257,42 @@ const PetDetail = () => {
                 name="timeCommitment"
                 value="5+ hours"
                 checked={formData.timeCommitment === '5+ hours'}
+                onChange={handleChange}
+              />
+            </Form.Group>
+
+            <Form.Group controlId="livingSituation" className="mt-3">
+              <Form.Label>What is your current living situation?</Form.Label>
+              <Form.Check
+                type="radio"
+                label="Apartment"
+                name="livingSituation"
+                value="Apartment"
+                checked={formData.livingSituation === 'Apartment'}
+                onChange={handleChange}
+              />
+              <Form.Check
+                type="radio"
+                label="House"
+                name="livingSituation"
+                value="House"
+                checked={formData.livingSituation === 'House'}
+                onChange={handleChange}
+              />
+              <Form.Check
+                type="radio"
+                label="Townhouse"
+                name="livingSituation"
+                value="Townhouse"
+                checked={formData.livingSituation === 'Townhouse'}
+                onChange={handleChange}
+              />
+              <Form.Check
+                type="radio"
+                label="Other"
+                name="livingSituation"
+                value="Other"
+                checked={formData.livingSituation === 'Other'}
                 onChange={handleChange}
               />
             </Form.Group>
