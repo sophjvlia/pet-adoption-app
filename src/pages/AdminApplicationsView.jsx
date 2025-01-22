@@ -9,16 +9,17 @@ import {
   Form,
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { PopupWidget } from 'react-calendly';
 import axios from 'axios';
 
 const AdminApplicationsView = () => {
-  const [applications, setApplications] = useState([]);
+  // const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
 
   // Fetch applications on component load
   useEffect(() => {
-    fetchApplications();
+    // fetchApplications();
   }, []);
 
   const fetchApplications = async () => {
@@ -48,6 +49,65 @@ const AdminApplicationsView = () => {
     setSelectedApplication(null);
     setShowModal(false);
   };
+
+  const applications = [
+    {
+      id: 1,
+      user_id: 'U12345',
+      pet_id: 'P56789',
+      reason: 'Looking for a companion.',
+      living_situation: 'Apartment',
+      experience: 'Owned a dog before',
+      household: 'Family of 4',
+      employment_status: 'Full-Time',
+      status: 'Approved',
+    },
+    {
+      id: 2,
+      user_id: 'U23456',
+      pet_id: 'P67890',
+      reason: 'My kids want a pet.',
+      living_situation: 'House with yard',
+      experience: 'No prior experience',
+      household: 'Family of 3',
+      employment_status: 'Part-Time',
+      status: 'Pending',
+    },
+    {
+      id: 3,
+      user_id: 'U34567',
+      pet_id: 'P78901',
+      reason: 'I want a jogging partner.',
+      living_situation: 'Condo',
+      experience: 'Owned a cat before',
+      household: 'Single',
+      employment_status: 'Self-Employed',
+      status: 'Rejected',
+    },
+    {
+      id: 4,
+      user_id: 'U45678',
+      pet_id: 'P89012',
+      reason: 'For emotional support.',
+      living_situation: 'House with yard',
+      experience: 'Volunteered at a shelter',
+      household: 'Couple',
+      employment_status: 'Unemployed',
+      status: 'Approved',
+    },
+    {
+      id: 5,
+      user_id: 'U56789',
+      pet_id: 'P90123',
+      reason: 'To teach my kids responsibility.',
+      living_situation: 'Apartment',
+      experience: 'Owned a rabbit before',
+      household: 'Family of 5',
+      employment_status: 'Full-Time',
+      status: 'Pending',
+    },
+  ];
+  
 
   return (
     <Container>
@@ -102,6 +162,12 @@ const AdminApplicationsView = () => {
                     >
                       <FaTrash />
                     </Button>
+                    <PopupWidget
+                      url="https://calendly.com/sophie-jcrabtree/30min"
+                      rootElement={document.getElementById('root')}
+                      text="Schedule"
+                      color="#00a2ff"
+                    />
                   </td>
                 </tr>
               ))}
