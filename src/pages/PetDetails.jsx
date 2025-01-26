@@ -9,25 +9,25 @@ const PetDetail = () => {
   const [pet, setPet] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    experience: '',
-    workSchedule: '',
-    timeCommitment: '',
-    outdoorSpace: '',
-    travelFrequency: '',
-    householdMembers: '',
-    petAllergies: '',
-    petTypesCaredFor: '',
-    petTraining: '',
-    adoptionReason: ''
+    user_id: '',         
+    pet_id: '',                 
+    experience: '',        
+    workSchedule: '',      
+    timeCommitment: '',    
+    outdoorSpace: '',      
+    travelFrequency: '',   
+    householdMembers: '', 
+    petAllergies: '',      
+    petTypesCaredFor: '',  
+    petTraining: '',       
+    adoptionReason: '',    
   });
+  
 
   useEffect(() => {
     const storedUserId = localStorage.getItem('user_id');
     if (storedUserId) {
-      setUserId(storedUserId);
+      setUserId(parseInt(storedUserId));
       setFormData({ ...formData, user_id: storedUserId });
     }
   }, []);
@@ -64,20 +64,19 @@ const PetDetail = () => {
       const apiData = {
         user_id: userId,
         pet_id: pet.id,
-        reason: formData.adoptionReason, 
-        living_situation: formData.livingSituation,
-        experience: formData.experience,
-        household: formData.householdMembers, 
-        employment_status: formData.workSchedule,
-        other_pets: formData.petTypesCaredFor, 
-        travel_frequency: formData.travelFrequency,
-        time_dedication: formData.timeCommitment, 
-        outdoor_space: formData.outdoorSpace,
-        allergies: formData.petAllergies, 
-        pet_training: formData.petTraining,
-        pet_preferences: formData.petPreferences,
+        experience: formData.experience, 
+        workSchedule: formData.workSchedule,
+        timeCommitment: formData.timeCommitment,
+        livingSituation: formData.livingSituation,
+        outdoorSpace: formData.outdoorSpace, 
+        travelFrequency: formData.travelFrequency, 
+        householdMembers: formData.householdMembers, 
+        petAllergies: formData.petAllergies, 
+        petTypesCaredFor: formData.petTypesCaredFor, 
+        petTraining: formData.petTraining, 
+        adoptionReason: formData.adoptionReason 
       };
-      
+
       try {
         const response = await fetch('https://pet-adoption-api-v2.vercel.app/application', {
           method: 'POST',
@@ -136,39 +135,6 @@ const PetDetail = () => {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            {/* <Form.Group controlId="name">
-              <Form.Label>Your Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter your name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="phone" className="mt-3">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Enter your phone number"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </Form.Group>
-
-            <Form.Group controlId="email" className="mt-3">
-              <Form.Label>Email Address</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Enter your email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </Form.Group> */}
-
             <Form.Group controlId="experience" className="mt-3">
               <Form.Label>Do you have prior experience with pets?</Form.Label>
               <Form.Check
