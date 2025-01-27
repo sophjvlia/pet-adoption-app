@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Form, Pagination } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Accordion from 'react-bootstrap/Accordion';
+import '../App.css';
 
 const PetsListingPage = () => {
   const [pets, setPets] = useState([]);
@@ -186,19 +187,24 @@ const PetsListingPage = () => {
           {currentPets.length > 0 ? (
             currentPets.map((pet) => (
               <Col md={4} sm={6} key={pet.id} className="mb-4">
-                <Card>
+                <Card className="pet-card">
                   <Link to={`${pet.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Card.Img
                       variant="top"
                       src={pet.image_url}
                       alt={pet.name}
+                      className="image"
                     />
                     <Card.Body>
                       <Card.Title>{pet.name}</Card.Title>
                       <Card.Text>
                         <strong>Species:</strong> {pet.species}
-                        <br />
-                        <strong>Breed:</strong> {pet.breed}
+                        <br/>
+                        <strong>Breed:</strong> {pet.breed_name}
+                        <br/>
+                        <strong>Gender:</strong> {pet.gender}
+                        <br/>
+                        <strong>Age:</strong> {pet.age}
                       </Card.Text>
                     </Card.Body>
                   </Link>

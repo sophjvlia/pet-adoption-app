@@ -50,3 +50,12 @@
 .iti__dropdown-content {
   z-index: 100;
 }
+
+.pet-card {
+  padding: 0;
+  border-radius: 10px;
+}
+
+.pet-card .image {
+  border-radius: 10px 10px 0 0;
+}
