@@ -3,8 +3,10 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 import '../App.css'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -42,9 +44,12 @@ export default function Login() {
     try {
       const response = await axios.post('https://pet-adoption-api-v2.vercel.app/login', { email, password });
       const { user, token } = response.data;
-      localStorage.setItem('user_id', user.id);
-      localStorage.setItem('token', token);
-      navigate('/pets');
+      if (user && token) {
+        login(token, user.id, user.is_admin);
+        navigate('/pets');
+      } else {
+        alert('Login failed.');
+      }
     } catch (error) {
       setMessage(error.response.data.error);
       setShowModal(true);
