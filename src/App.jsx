@@ -57,8 +57,8 @@ function App() {
           <Route path="login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="pets" element={<PetsListingPage/>} />
           <Route path="pets/:id" element={<PetDetailsPage/>} />
-          <Route path="dashboard/pets" element={<AdminPetsView/>} />
-          <Route path="dashboard/applications" element={<AdminApplicationsView/>} />
+          <Route path="dashboard/pets" element={isAdmin ? <AdminPetsView/> : <Navigate to="/"/>} />
+          <Route path="dashboard/applications" element={isAdmin ? <AdminApplicationsView/> : <Navigate to="/"/>} />
         </Route>
       </Routes>
     </BrowserRouter>
