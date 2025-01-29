@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Pagination } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Pagination, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Accordion from 'react-bootstrap/Accordion';
@@ -183,11 +183,11 @@ const PetsListingPage = () => {
         </Row>
 
         {/* Pets Listing */}
-        <Row>
+        <Row className="g-4">
           {currentPets.length > 0 ? (
             currentPets.map((pet) => (
               <Col md={4} sm={6} key={pet.id} className="mb-4">
-                <Card className="pet-card">
+                <Card className="pet-card shadow-sm">
                   <Link to={`${pet.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Card.Img
                       variant="top"
@@ -195,16 +195,15 @@ const PetsListingPage = () => {
                       alt={pet.name}
                       className="image"
                     />
-                    <Card.Body>
-                      <Card.Title>{pet.name}</Card.Title>
-                      <Card.Text>
-                        <strong>Species:</strong> {pet.species}
-                        <br/>
-                        <strong>Breed:</strong> {pet.breed_name}
-                        <br/>
-                        <strong>Gender:</strong> {pet.gender}
-                        <br/>
-                        <strong>Age:</strong> {pet.age}
+                    <Card.Body className="p-0">
+                      <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{ backgroundColor: 'rgba(255, 182, 193, 0.8)' }}>
+                        <Card.Title className="me-2">{pet.name}</Card.Title>
+                        <Badge bg={pet.species == "Cat" ? "success" : "warning"} className="mb-1">{pet.species}</Badge>
+                      </div>
+                      <Card.Text className="d-flex flex-column align-items-start p-4">
+                        <div><strong>Breed:</strong> {pet.breed_name}</div>
+                        <div><strong>Gender:</strong> {pet.gender}</div>
+                        <div><strong>Age:</strong> {pet.age}</div>
                       </Card.Text>
                     </Card.Body>
                   </Link>

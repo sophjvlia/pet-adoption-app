@@ -9,6 +9,7 @@ import AdminPetsView from './pages/AdminPetsView'
 import AdminApplicationsView from './pages/AdminApplicationsView'
 import './App.css';
 import { useAuth } from './contexts/AuthContext';
+import pawsAndTails from './assets/paws-and-tails-bg.png'
 
 export function Layout() {
   const { isLoggedIn, isAdmin, logout } = useAuth();
@@ -24,9 +25,11 @@ export function Layout() {
 
   return (
     <>
-      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary position-fixed w-100">
+      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary position-fixed w-100" style={{ zIndex: '100' }}>
         <Container>
-          <Navbar.Brand href="/">Paws and Tails</Navbar.Brand>
+          <Navbar.Brand href="/">
+            <img width="150" src={pawsAndTails} />
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">

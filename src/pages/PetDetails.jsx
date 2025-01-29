@@ -103,7 +103,7 @@ const PetDetail = () => {
 
   return (
     <div className="container mt-5 pt-5">
-      <Row>
+      <Row className="rounded rounded-full shadow-sm px-3 py-4" style={{ backgroundColor: 'rgba(255, 182, 193, 0.8)' }}>
         {/* Image Section */}
         <Col md={4}>
           <img
@@ -112,7 +112,7 @@ const PetDetail = () => {
             className="img-fluid rounded mb-3"
           />
           <Button variant="primary" className="w-100" onClick={handleOpenModal}>
-            Adopt Me!
+            Adopt {pet.name}!
           </Button>
         </Col>
 
@@ -123,7 +123,6 @@ const PetDetail = () => {
           <p><strong>Breed:</strong> {pet.breed_name}</p>
           <p><strong>Gender:</strong> {pet.gender}</p>
           <p><strong>Age:</strong> {pet.age}</p>
-          <p><strong>Status:</strong> {pet.status}</p>
           <p><strong>Description:</strong> {pet.description}</p>
         </Col>
       </Row>

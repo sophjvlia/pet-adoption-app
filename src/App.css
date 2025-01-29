@@ -51,11 +51,29 @@
   z-index: 100;
 }
 
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .pet-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 10.5px !important;
 }
 
 .pet-card .image {
   border-radius: 10px 10px 0 0;
+  flex-shrink: 0;
+  height: 200px;
+  object-fit: cover;
+}
+
+.pet-card .card-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
