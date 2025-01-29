@@ -7,21 +7,24 @@ import {
   Button,
   Modal,
   Form,
-  Pagination
+  Pagination,
+  Spinner
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import axios from 'axios';
 import Accordion from 'react-bootstrap/Accordion';
 
 const AdminPetsView = () => {
-
   const [pets, setPets] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [addLoading, setAddLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedPet, setSelectedPet] = useState(null);
   const [breeds, setBreeds] = useState([]);
-  const [status, setStatus] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     species: '',
@@ -33,6 +36,7 @@ const AdminPetsView = () => {
     status: '',
   });
   const [errors, setErrors] = useState({});
+
   // Pagination
   const [filteredPets, setFilteredPets] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,7 +113,6 @@ const AdminPetsView = () => {
   };
   
 
-
   // Handle pet species change
   const handleSpeciesChange = async (e) => {
     const { name, value } = e.target;
@@ -124,6 +127,7 @@ const AdminPetsView = () => {
 
 
   const fetchBreedsBySpecies = async (species) => {
+    console.log(species);
     if (species.trim().toLowerCase() == 'dog') {
       try {
         const response = await axios.get(
@@ -224,8 +228,10 @@ const AdminPetsView = () => {
 
   // Add new pet
   const handleAddPet = async () => {
+    setAddLoading(true);
 
     if (!validateFields()) {
+      setAddLoading(false);
       return; 
     }
 
@@ -240,8 +246,12 @@ const AdminPetsView = () => {
         }
       );
 
-      setPets([...pets, { ...response.data, id: pets.length + 1 }]);
+      setPets([...pets, { ...response.data, id: response.data.id }]);
+      console.log(pets);
+      setAddLoading(false);
       setShowAddModal(false);
+      setSuccess(true);
+      setShowSuccessModal(true);
 
       setFormData({
         name: '',
@@ -254,12 +264,17 @@ const AdminPetsView = () => {
         status: '',
       });
     } catch (error) {
+      setAddLoading(false);
+      setShowAddModal(false);
+      setShowSuccessModal(true);
       console.error('Error during login:', error);
     }
   };
 
   // Edit pet
   const handleEditPet = async () => {
+    setEditLoading(true);
+
     try {
       const response = await axios.put(
         `https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`,
@@ -271,7 +286,10 @@ const AdminPetsView = () => {
         }
       );
 
+      setEditLoading(false);
       setShowEditModal(false);
+      setSuccess(true);
+      setShowSuccessModal(true);
 
       // Reset the form data
       setFormData({
@@ -285,15 +303,30 @@ const AdminPetsView = () => {
         status: '',
       });
     } catch (error) {
+      setEditLoading(false);
+      setShowEditModal(false);
+      setShowSuccessModal(true);
       console.error('Error during login:', error);
     }
+
     setPets(
       pets.map((pet) =>
         pet.id === selectedPet.id ? { ...selectedPet, ...formData } : pet
       )
     );
+
+    setEditLoading(false);
     setShowEditModal(false);
-    setFormData({ name: '', species: '', breed: '' });
+    setFormData({
+      name: '',
+      species: '',
+      breed: '',
+      gender: '',
+      age: '',
+      description: '',
+      image: '',
+      status: '',
+    });
   };
 
   // Delete pet
@@ -655,8 +688,8 @@ const AdminPetsView = () => {
           <Button variant="secondary" onClick={() => setShowAddModal(false)}>
             Cancel
           </Button>
-          <Button variant="success" onClick={handleAddPet}>
-            Add Pet
+          <Button variant="success" onClick={handleAddPet} disabled={addLoading}>
+            {addLoading ? <Spinner animation="border" size="sm" /> : 'Add Pet'}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -788,8 +821,8 @@ const AdminPetsView = () => {
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleEditPet}>
-            Save Changes
+          <Button variant="primary" onClick={handleEditPet} disabled={editLoading}>
+            {editLoading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -810,6 +843,22 @@ const AdminPetsView = () => {
           </Pagination>
         </Col>
       </Row>
+
+      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{success ? 'Success' : 'Error'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {success
+            ? 'Pet added successful!'
+            : 'An error occurred. Please try again.'}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

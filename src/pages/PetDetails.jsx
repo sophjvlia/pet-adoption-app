@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, Spinner } from "react-bootstrap";
 import axios from 'axios';
 
 const PetDetail = () => {
   const { id } = useParams();
   const [userId, setUserId] = useState(null);
   const [pet, setPet] = useState([]);
+  const [success, setSuccess] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     user_id: '',         
     pet_id: '',                 
@@ -30,7 +33,7 @@ const PetDetail = () => {
       setUserId(parseInt(storedUserId));
       setFormData({ ...formData, user_id: storedUserId });
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     const fetchPetDetails = async () => {
@@ -59,7 +62,8 @@ const PetDetail = () => {
   };
 
   const handleSubmit = async () => {
-
+    setLoading(true);
+    setSuccess(false);
     if (userId) {
       const apiData = {
         user_id: userId,
@@ -87,11 +91,19 @@ const PetDetail = () => {
         });
 
         if (response.ok) {
-          alert('Form submitted successfully');
+          setLoading(false);
+          setSuccess(true);
+          setShowSuccessModal(true);
+          handleCloseModal();
         } else {
-          alert('Failed to submit form');
+          setLoading(false);
+          setShowSuccessModal(false);
+          handleCloseModal();
         }
       } catch (error) {
+        setLoading(false);
+        setShowSuccessModal(false);
+        handleCloseModal();
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form');
       }
@@ -134,7 +146,7 @@ const PetDetail = () => {
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="experience" className="mt-3">
+            <Form.Group controlId="experience">
               <Form.Label>Do you have prior experience with pets?</Form.Label>
               <Form.Check
                 type="radio"
@@ -495,8 +507,24 @@ const PetDetail = () => {
           <Button variant="secondary" onClick={handleCloseModal}>
             Close
           </Button>
-          <Button variant="success" onClick={handleSubmit}>
-            Submit
+          <Button variant="success" onClick={handleSubmit} disabled={loading}>
+            {loading ? <Spinner animation="border" size="sm" /> : 'Submit'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showSuccessModal} onHide={() => setShowSuccessModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{success ? 'Success' : 'Error'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {success
+            ? 'Application submitted successful!'
+            : 'An error occurred. Please try again.'}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

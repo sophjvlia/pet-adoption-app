@@ -34,10 +34,10 @@ export function Layout() {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/pets">Pets</Nav.Link>
-              {isLoggedIn && isAdmin && <Nav.Link href="/dashboard/pets">Admin Pets</Nav.Link>}
-              {isLoggedIn && isAdmin && <Nav.Link href="/dashboard/applications">Admin Applications</Nav.Link>}
-              {!isLoggedIn && <Nav.Link href="/login">Login</Nav.Link>}
-              {isLoggedIn && <Nav.Link onClick={logout}>Logout</Nav.Link>}
+              {<Nav.Link href="/dashboard/pets">Admin Pets</Nav.Link>}
+              {<Nav.Link href="/dashboard/applications">Admin Applications</Nav.Link>}
+              {<Nav.Link href="/login">Login</Nav.Link>}
+              {<Nav.Link onClick={logout}>Logout</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -64,8 +64,8 @@ function App() {
           <Route path="login" element={<Login/>} />
           <Route path="pets" element={<PetsListingPage/>} />
           <Route path="pets/:id" element={<PetDetailsPage/>} />
-          <Route path="dashboard/pets" element={isAdmin ? <AdminPetsView/> : <Navigate to="/"/>} />
-          <Route path="dashboard/applications" element={isAdmin ? <AdminApplicationsView/> : <Navigate to="/"/>} />
+          <Route path="dashboard/pets" element={<AdminPetsView/>} />
+          <Route path="dashboard/applications" element={<AdminApplicationsView/>} />
         </Route>
       </Routes>
     </BrowserRouter>
