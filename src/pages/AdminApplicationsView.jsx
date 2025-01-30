@@ -7,6 +7,7 @@ import {
   Button,
   Modal,
   Form,
+  Spinner
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { PopupWidget } from 'react-calendly';
@@ -15,6 +16,7 @@ import axios from 'axios';
 const AdminApplicationsView = () => {
   const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
 
   // Fetch applications on component load
@@ -36,9 +38,39 @@ const AdminApplicationsView = () => {
     setShowModal(true);
   };
 
+  const updateStatus = async (id) => {
+    setLoading(true);
+
+    try {
+
+      const statusMap = {
+        approved: 1,
+        pending: 0,
+        rejected: -1
+      };
+
+      const response = await axios.put(
+        `https://pet-adoption-api-v2.vercel.app/application/${id}/status`,
+        { 
+          status: statusMap[selectedApplication.status],
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+    } catch (error) {
+      console.error('Error during updating status:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteApplication = async (id) => {
     try {
-      await axios.delete(`/api/applications/${id}`);
+      await axios.delete(`https://pet-adoption-api-v2.vercel.app/applications/${id}`);
       setApplications(applications.filter((app) => app.id !== id));
     } catch (error) {
       console.error('Error deleting application:', error);
@@ -336,7 +368,9 @@ const AdminApplicationsView = () => {
             <Button variant="secondary" onClick={handleModalClose}>
               Close
             </Button>
-            <Button variant="primary">Save Changes</Button>
+            <Button type="button" className="my-1 py-2 w-100" onClick={() => updateStatus(selectedApplication.id)} disabled={loading}>
+              {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+            </Button>
           </Modal.Footer>
         </Modal>
       )}
