@@ -16,8 +16,12 @@ import axios from 'axios';
 const AdminApplicationsView = () => {
   const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [actionType, setActionType] = useState(null); 
+  const [success, setSuccess] = useState(false);
+
 
   // Fetch applications on component load
   useEffect(() => {
@@ -40,19 +44,14 @@ const AdminApplicationsView = () => {
 
   const updateStatus = async (id) => {
     setLoading(true);
+    setActionType('statusUpdate');
 
     try {
 
-      const statusMap = {
-        approved: 1,
-        pending: 0,
-        rejected: -1
-      };
-
       const response = await axios.put(
-        `https://pet-adoption-api-v2.vercel.app/application/${id}/status`,
+        `https://pet-adoption-api-v2.vercel.app/applications/${id}/status`,
         { 
-          status: statusMap[selectedApplication.status],
+          status: selectedApplication.status,
         },
         {
           headers: {
@@ -61,19 +60,42 @@ const AdminApplicationsView = () => {
         }
       );
 
+      if (response.data.success) {
+        setSuccess(true); 
+        setShowModal(false);
+        setShowStatusModal(true);
+      } else {
+        setSuccess(false); 
+        setShowModal(false);
+        setShowStatusModal(true);
+      }
     } catch (error) {
       console.error('Error during updating status:', error);
+      setSuccess(false); 
+      setShowModal(false);
+      setShowStatusModal(true);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleDeleteClick = (application) => {
+    setSelectedApplication(application);
+    setShowModal(true);
+  };
+
   const handleDeleteApplication = async (id) => {
+    setActionType('deleteApplication'); 
     try {
-      await axios.delete(`https://pet-adoption-api-v2.vercel.app/applications/${id}`);
+      const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/applications/${id}`);
+      
       setApplications(applications.filter((app) => app.id !== id));
+      setSuccess(true);
+      setShowStatusModal(true);
     } catch (error) {
       console.error('Error deleting application:', error);
+      setSuccess(false); 
+      setShowStatusModal(true);
     }
   };
 
@@ -119,7 +141,19 @@ const AdminApplicationsView = () => {
                   <td>{application.experience ? 'Yes' : 'No'}</td>
                   <td>{application.household_members}</td>
                   <td>{application.work_schedule}</td>
-                  <td>{application.status || 'Pending'}</td>
+                  <td>
+                    {
+                      application.status === 1 ? (
+                        <span style={{ color: 'green' }}>Approved</span>
+                      ) : application.status === 0 ? (
+                        <span style={{ color: 'yellow' }}>Pending</span>
+                      ) : application.status === -1 ? (
+                        <span style={{ color: 'red' }}>Rejected</span>
+                      ) : (
+                        <span>Pending</span>
+                      )
+                    }
+                  </td>
                   <td>
                     <Button
                       variant="info"
@@ -338,27 +372,33 @@ const AdminApplicationsView = () => {
                     className="me-4"
                     label="Approved"
                     name="applicationStatus"
-                    value="approved"
-                    checked={selectedApplication.status === "approved"}
-                    onChange={(e) => setSelectedApplication({ ...selectedApplication, status: e.target.value })}
+                    value={1}
+                    checked={selectedApplication.status === 1}
+                    onChange={(e) =>
+                      setSelectedApplication({ ...selectedApplication, status: parseInt(e.target.value) })
+                    }
                   />
                   <Form.Check
                     type="radio"
                     className="me-4"
                     label="Pending"
                     name="applicationStatus"
-                    value="pending"
-                    checked={selectedApplication.status === "pending"}
-                    onChange={(e) => setSelectedApplication({ ...selectedApplication, status: e.target.value })}
+                    value={0}
+                    checked={selectedApplication.status === 0}
+                    onChange={(e) =>
+                      setSelectedApplication({ ...selectedApplication, status: parseInt(e.target.value) })
+                    }
                   />
                   <Form.Check
                     type="radio"
                     className="me-4"
                     label="Rejected"
                     name="applicationStatus"
-                    value="rejected"
-                    checked={selectedApplication.status === "rejected"}
-                    onChange={(e) => setSelectedApplication({ ...selectedApplication, status: e.target.value })}
+                    value={-1}
+                    checked={selectedApplication.status === -1}
+                    onChange={(e) =>
+                      setSelectedApplication({ ...selectedApplication, status: parseInt(e.target.value) })
+                    }
                   />
                 </div>
               </Form.Group>
@@ -368,12 +408,32 @@ const AdminApplicationsView = () => {
             <Button variant="secondary" onClick={handleModalClose}>
               Close
             </Button>
-            <Button type="button" className="my-1 py-2 w-100" onClick={() => updateStatus(selectedApplication.id)} disabled={loading}>
+            <Button type="button" className="my-1 py-2" onClick={() => updateStatus(selectedApplication.id)} disabled={loading}>
               {loading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
             </Button>
           </Modal.Footer>
         </Modal>
       )}
+
+      <Modal show={showStatusModal} onHide={() => setShowStatusModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{success ? 'Success' : 'Error'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {success ? (
+            actionType === 'statusUpdate'
+              ? 'Application status updated successfully!'
+              : 'Application deleted successfully!'
+          ) : (
+            'An error occurred. Please try again.'
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowStatusModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
