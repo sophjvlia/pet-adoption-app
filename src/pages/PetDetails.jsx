@@ -115,7 +115,7 @@ const PetDetail = () => {
 
   return (
     <div className="container mt-5 pt-5">
-      <Row className="rounded rounded-full shadow-sm px-3 py-4" style={{ backgroundColor: 'rgba(255, 182, 193, 0.8)' }}>
+      <Row className="rounded rounded-full shadow-sm px-3 py-4" style={{ backgroundColor: 'rgba(255, 111, 97, 0.8)' }}>
         {/* Image Section */}
         <Col md={4}>
           <img

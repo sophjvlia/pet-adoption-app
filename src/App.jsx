@@ -25,7 +25,7 @@ export function Layout() {
 
   return (
     <>
-      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary position-fixed w-100" style={{ zIndex: '100' }}>
+      <Navbar collapseOnSelect expand="lg" className="bg-main position-fixed w-100" style={{ zIndex: '100' }}>
         <Container>
           <Navbar.Brand href="/">
             <img width="150" src={pawsAndTails} />

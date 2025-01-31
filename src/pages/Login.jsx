@@ -63,7 +63,7 @@ export default function Login() {
     <Container fluid className="d-flex justify-content-center align-items-center h-100">
       <Row className="d-flex justify-content-center align-items-center w-100">
         <Col lg={5}>
-          <div className="signup-container bg-light bg-gradient p-4 pb-2 rounded rounded-full shadow">
+          <div className="signup-container bg-main p-4 pb-2 rounded rounded-full shadow">
             <h4 className="mt-1 mb-4">
               Log In
             </h4>

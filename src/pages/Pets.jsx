@@ -196,7 +196,7 @@ const PetsListingPage = () => {
                       className="image"
                     />
                     <Card.Body className="p-0">
-                      <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{ backgroundColor: 'rgba(255, 182, 193, 0.8)' }}>
+                      <div className="d-flex justify-content-center align-items-center pt-2 pb-1" style={{ backgroundColor: 'rgba(255, 111, 97, 0.8)' }}>
                         <Card.Title className="me-2">{pet.name}</Card.Title>
                         <Badge bg={pet.species == "Cat" ? "success" : "warning"} className="mb-1">{pet.species}</Badge>
                       </div>
