@@ -45,7 +45,7 @@ export default function Login() {
       const response = await axios.post('https://pet-adoption-api-v2.vercel.app/login', { email, password });
       const { user, token } = response.data;
       if (user && token) {
-        login(token, user.id, user.is_admin);
+        login(token, user);
         navigate('/pets');
       } else {
         alert('Login failed.');

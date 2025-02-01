@@ -8,24 +8,23 @@ import PetDetailsPage from './pages/PetDetails'
 import AdminPetsView from './pages/AdminPetsView'
 import AdminApplicationsView from './pages/AdminApplicationsView'
 import './App.css';
-import { useAuth } from './contexts/AuthContext';
+import { AppProvider, useAuth } from './contexts/AuthContext';
 import pawsAndTails from './assets/paws-and-tails-bg.png'
 
 export function Layout() {
   const { isLoggedIn, isAdmin, logout } = useAuth();
-  console.log(isLoggedIn);
-  console.log(isAdmin);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
-  // const handleLogout = () => {
-  //   localStorage.removeItem('token'); 
-  //   setIsLoggedIn(false); 
-  //   navigate('/login'); 
-  // };
+  // Redirect logged-in users from Login page
+  useEffect(() => {
+    if (isLoggedIn && window.location.pathname === "/login") {
+      navigate("/pets");
+    }
+  }, [isLoggedIn, navigate]);
 
   return (
     <>
-      <Navbar collapseOnSelect expand="lg" className="bg-main position-fixed w-100" style={{ zIndex: '100' }}>
+      <Navbar collapseOnSelect expand="lg" className="bg-main position-fixed w-100" style={{ zIndex: "100" }}>
         <Container>
           <Navbar.Brand href="/">
             <img width="150" src={pawsAndTails} />
@@ -34,10 +33,10 @@ export function Layout() {
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/pets">Pets</Nav.Link>
-              {<Nav.Link href="/dashboard/pets">Admin Pets</Nav.Link>}
-              {<Nav.Link href="/dashboard/applications">Admin Applications</Nav.Link>}
-              {<Nav.Link href="/login">Login</Nav.Link>}
-              {<Nav.Link onClick={logout}>Logout</Nav.Link>}
+              {isAdmin && <Nav.Link href="/dashboard/pets">Admin Pets</Nav.Link>}
+              {isAdmin && <Nav.Link href="/dashboard/applications">Admin Applications</Nav.Link>}
+              {!isLoggedIn && <Nav.Link href="/login">Login</Nav.Link>}
+              {isLoggedIn && <Nav.Link onClick={logout}>Logout</Nav.Link>}
             </Nav>
           </Navbar.Collapse>
         </Container>
