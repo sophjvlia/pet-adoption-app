@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Container, Nav, Navbar } from 'react-bootstrap';
 import { BrowserRouter, Routes, Route, Outlet, useNavigate, Navigate, useLocation, Link } from 'react-router-dom'
 import Signup from './pages/Signup'
@@ -40,7 +40,7 @@ export function Layout() {
             <Nav className="me-auto">
               <Nav.Link as={Link} to="/pets">Pets</Nav.Link>
               {isAdmin && <Nav.Link as={Link} to="/dashboard/pets">My Pets</Nav.Link>}
-              {isAdmin && <Nav.Link as={Link} to="/dashboard/applications">My Applications</Nav.Link>}
+              <Nav.Link as={Link} to="/dashboard/applications">My Applications</Nav.Link>
               {!isLoggedIn && <Nav.Link as={Link} to="/login">Login</Nav.Link>}
               {isLoggedIn && <Nav.Link onClick={handleLogout}>Logout</Nav.Link>}
             </Nav>

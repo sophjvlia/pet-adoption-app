@@ -10,10 +10,12 @@ import {
   Spinner
 } from 'react-bootstrap';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { PopupWidget } from 'react-calendly';
+import { PopupButton } from 'react-calendly';
+import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const AdminApplicationsView = () => {
+  const { isAdmin } = useAuth();
   const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -123,10 +125,23 @@ const AdminApplicationsView = () => {
                 <th>#</th>
                 <th>Applicant</th>
                 <th>Pet</th>
-                <th>Living Situation</th>
-                <th>Experience</th>
-                <th>Household</th>
-                <th>Work Status</th>
+
+                {!isAdmin ? (
+                  <>
+                    <th>Species</th>
+                    <th>Breed</th>
+                    <th>Gender</th>
+                    <th>Age</th>
+                  </>
+                ) : (
+                  <>
+                    <th>Living Situation</th>
+                    <th>Experience</th>
+                    <th>Household</th>
+                    <th>Work Status</th>
+                  </>
+                )}
+                
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -136,11 +151,24 @@ const AdminApplicationsView = () => {
                 <tr key={application.id}>
                   <td>{index + 1}</td>
                   <td>{application.first_name + ' ' + application.last_name}</td>
-                  <td>{application.pet_name}</td>
-                  <td>{application.living_situation}</td>
-                  <td>{application.experience ? 'Yes' : 'No'}</td>
-                  <td>{application.household_members}</td>
-                  <td>{application.work_schedule}</td>
+
+                  {!isAdmin ? (
+                    <>
+                      <td>{application.pet_name}</td>
+                      <td>{application.species}</td>
+                      <td>{application.breed_name}</td>
+                      <td>{application.gender}</td>
+                      <td>{application.age}</td>
+                    </>
+                  ) : (
+                    <>
+                      <td>{application.living_situation}</td>
+                      <td>{application.experience ? 'Yes' : 'No'}</td>
+                      <td>{application.household_members}</td>
+                      <td>{application.work_schedule}</td>
+                    </>
+                  )}
+
                   <td>
                     {
                       application.status === 1 ? (
@@ -155,25 +183,30 @@ const AdminApplicationsView = () => {
                     }
                   </td>
                   <td>
-                    <Button
-                      variant="info"
-                      className="me-2"
-                      onClick={() => handleEditClick(application)}
-                    >
-                      <FaEdit />
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleDeleteApplication(application.id)}
-                    >
-                      <FaTrash />
-                    </Button>
-                    <PopupWidget
-                      url="https://calendly.com/sophie-jcrabtree/30min"
-                      rootElement={document.getElementById('root')}
-                      text="Schedule"
-                      color="#00a2ff"
-                    />
+                    {isAdmin && (
+                      <>
+                        <Button
+                          variant="info"
+                          className="me-2"
+                          onClick={() => handleEditClick(application)}
+                        >
+                          <FaEdit />
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleDeleteApplication(application.id)}
+                        >
+                          <FaTrash />
+                        </Button>
+                      </>
+                    )}
+                    {!isAdmin && application.status === 1 && (
+                      <PopupButton
+                        url="https://calendly.com/sophie-jcrabtree/30min"
+                        rootElement={document.getElementById("root")}
+                        text="Schedule Adoption"
+                      />
+                    )}
                   </td>
                 </tr>
               ))}
