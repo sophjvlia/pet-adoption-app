@@ -42,6 +42,27 @@ export default function Signup() {
     setPhoneNumber(currentNumber); 
   };
 
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+  
+    if (!newPassword) {
+      setPasswordError('Password is required.');
+    } else if (newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+    } else if (!/(?=.*[a-z])/.test(newPassword)) {
+      setPasswordError('Password must include at least one lowercase letter.');
+    } else if (!/(?=.*[A-Z])/.test(newPassword)) {
+      setPasswordError('Password must include at least one uppercase letter.');
+    } else if (!/(?=.*\d)/.test(newPassword)) {
+      setPasswordError('Password must include at least one number.');
+    } else if (!/(?=.*\W)/.test(newPassword)) {
+      setPasswordError('Password must include at least one special character.');
+    } else {
+      setPasswordError('');
+    }
+  };
+
   async function handleSignUp(e) {
     e.preventDefault();
     setLoading(true);
@@ -72,21 +93,6 @@ export default function Signup() {
 
     if (!email) {
       setEmailError('Email is required.');
-      valid = false;
-    }
-
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-
-    if (!password) {
-      setPasswordError('Password is required.');
-      valid = false;
-    } else if (password.length < 6) {
-      setPasswordError('Password must be at least 6 characters long.');
-      valid = false;
-    } else if (!passwordRegex.test(password)) {
-      setPasswordError(
-        'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.'
-      );
       valid = false;
     }
 
@@ -221,13 +227,18 @@ export default function Signup() {
                     type="password"
                     placeholder="Password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     isInvalid={!!passwordError}
                   />
                   <Form.Control.Feedback type="invalid" className="d-flex justify-content-start">
                     {passwordError}
                   </Form.Control.Feedback>
                 </FloatingLabel>
+                {password && !passwordError && (
+                  <Form.Text className="text-success">
+                    Password looks good!
+                  </Form.Text>
+                )}
               </Form.Group>
 
               <Button type="submit" className="my-1 py-2 w-100" disabled={loading}>
