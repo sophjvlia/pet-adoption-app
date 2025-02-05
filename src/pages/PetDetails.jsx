@@ -30,12 +30,12 @@ const PetDetail = () => {
   
 
   useEffect(() => {
-    const storedUserId = localStorage.getItem('user_id');
-    if (storedUserId) {
-      setUserId(parseInt(storedUserId));
-      setFormData({ ...formData, user_id: storedUserId });
+    if (user && user.id) {
+      const storedUserId = parseInt(user.id, 10);
+      setUserId(storedUserId);
+      setFormData((prevData) => ({ ...prevData, user_id: storedUserId }));
     }
-  }, [id]);
+  }, [user, id]);
 
   useEffect(() => {
     const fetchPetDetails = async () => {
@@ -117,9 +117,9 @@ const PetDetail = () => {
 
   return (
     <div className="container mt-5 pt-5">
-      <Row className="rounded rounded-full shadow-sm px-3 py-4" style={{ backgroundColor: 'rgba(255, 111, 97, 0.8)' }}>
+      <Row className="rounded rounded-full shadow-sm mx-2 px-3 py-4" style={{ backgroundColor: 'rgba(255, 111, 97, 0.8)' }}>
         {/* Image Section */}
-        <Col md={4}>
+        <Col md={4} className="mb-4 mb-md-0">
           <img
             src={pet.image_url}
             alt={pet.name}
@@ -131,7 +131,7 @@ const PetDetail = () => {
         </Col>
 
         {/* Details Section */}
-        <Col md={8}>
+        <Col md={8} className="px-4 d-flex flex-column align-items-start">
           <h2>{pet.name}</h2>
           <div><strong>Species:</strong> {pet.species}</div>
           <div><strong>Breed:</strong> {pet.breed_name}</div>

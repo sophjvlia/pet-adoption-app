@@ -82,3 +82,13 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
+@media (max-width: 768px) {
+  .signup-container {
+    margin-top: 16rem;
+  }
+
+  .login-container {
+    margin-top: 5rem;
+  }
+}

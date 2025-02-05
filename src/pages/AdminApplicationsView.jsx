@@ -132,6 +132,8 @@ const AdminApplicationsView = () => {
                     <th>Breed</th>
                     <th>Gender</th>
                     <th>Age</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </>
                 ) : (
                   <>
@@ -139,11 +141,10 @@ const AdminApplicationsView = () => {
                     <th>Experience</th>
                     <th>Household</th>
                     <th>Work Status</th>
+                    <th>Status</th>
                   </>
                 )}
                 
-                <th>Status</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>

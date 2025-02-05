@@ -19,9 +19,11 @@ const AdminPetsView = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [success, setSuccess] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [selectedPet, setSelectedPet] = useState(null);
   const [breeds, setBreeds] = useState([]);
@@ -330,27 +332,62 @@ const AdminPetsView = () => {
   };
 
   // Delete pet
-  const handleDeletePet = async (id) => {
-    if (window.confirm('Are you sure you want to delete this pet?')) {
-      try {
-        const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${id}`);
+  // const handleDeletePet = async (id) => {
+  //   if (window.confirm('Are you sure you want to delete this pet?')) {
+  //     try {
+  //       const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${id}`);
   
-        // Reset the form data
-        setFormData({
-          name: '',
-          species: '',
-          breed: '',
-          gender: '',
-          age: '',
-          description: '',
-          image: '',
-          status: '',
-        });
+  //       // Reset the form data
+  //       setFormData({
+  //         name: '',
+  //         species: '',
+  //         breed: '',
+  //         gender: '',
+  //         age: '',
+  //         description: '',
+  //         image: '',
+  //         status: '',
+  //       });
 
-        fetchPets();
-      } catch (error) {
-        console.error('Error during login:', error);
-      }
+  //       fetchPets();
+  //     } catch (error) {
+  //       console.error('Error during login:', error);
+  //     }
+  //   }
+  // };
+
+  // Open delete modal and store pet ID
+  const handleOpenDeleteModal = (id) => {
+    setSelectedPet(id);
+    setShowDeleteModal(true);
+  };
+
+  // Handle pet deletion
+  const handleDeletePet = async () => {
+    if (!selectedPet) return; // Prevent deletion if no pet is selected
+
+    setDeleteLoading(true);
+    try {
+      await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`);
+
+      // Reset form data
+      setFormData({
+        name: '',
+        species: '',
+        breed: '',
+        gender: '',
+        age: '',
+        description: '',
+        image: '',
+        status: '',
+      });
+
+      fetchPets(); // Refresh pet list
+      setShowDeleteModal(false);
+    } catch (error) {
+      console.error('Error deleting pet:', error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -548,7 +585,7 @@ const AdminPetsView = () => {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => handleDeletePet(pet.id)}
+                      onClick={() => handleOpenDeleteModal(pet.id)}
                     >
                       <FaTrash />
                     </Button>
@@ -856,6 +893,23 @@ const AdminPetsView = () => {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowSuccessModal(false)}>
             Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Pet</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this pet? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeletePet} disabled={deleteLoading}>
+            {deleteLoading ? <Spinner animation="border" size="sm" /> : "Confirm"}
           </Button>
         </Modal.Footer>
       </Modal>
