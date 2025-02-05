@@ -62,6 +62,7 @@ const AdminApplicationsView = () => {
         `https://pet-adoption-api-v2.vercel.app/applications/${id}/status`,
         { 
           status: selectedApplication.status,
+          petId: parseInt(selectedApplication.pet_id)
         },
         {
           headers: {
@@ -74,6 +75,7 @@ const AdminApplicationsView = () => {
         setSuccess(true); 
         setShowModal(false);
         setShowStatusModal(true);
+        fetchApplications();
       } else {
         setSuccess(false); 
         setShowModal(false);
@@ -160,10 +162,10 @@ const AdminApplicationsView = () => {
                 <tr key={application.id}>
                   <td>{index + 1}</td>
                   <td>{application.first_name + ' ' + application.last_name}</td>
+                  <td>{application.pet_name}</td>
 
                   {!isAdmin ? (
                     <>
-                      <td>{application.pet_name}</td>
                       <td>{application.species}</td>
                       <td>{application.breed_name}</td>
                       <td>{application.gender}</td>
@@ -181,13 +183,13 @@ const AdminApplicationsView = () => {
                   <td>
                     {
                       application.status === 1 ? (
-                        <span style={{ color: 'green' }}>Approved</span>
+                        <span className="text-success">Approved</span>
                       ) : application.status === 0 ? (
-                        <span style={{ color: 'yellow' }}>Pending</span>
+                        <span className="text-warning">Pending</span>
                       ) : application.status === -1 ? (
-                        <span style={{ color: 'red' }}>Rejected</span>
+                        <span className="text-danger">Rejected</span>
                       ) : (
-                        <span>Pending</span>
+                        <span className="text-warning">Pending</span>
                       )
                     }
                   </td>
@@ -209,13 +211,15 @@ const AdminApplicationsView = () => {
                         </Button>
                       </>
                     )}
-                    {!isAdmin && application.status === 1 && (
+                    {!isAdmin && (application.status === 1 ? (
                       <PopupButton
                         url="https://calendly.com/sophie-jcrabtree/30min"
                         rootElement={document.getElementById("root")}
                         text="Schedule Adoption"
                       />
-                    )}
+                    ) : (
+                      <span>N/A</span>
+                    ))}
                   </td>
                 </tr>
               ))}
