@@ -15,7 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 
 const AdminApplicationsView = () => {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -27,15 +27,23 @@ const AdminApplicationsView = () => {
 
   // Fetch applications on component load
   useEffect(() => {
-    fetchApplications();
-  }, []);
+    if (user !== null) {
+      fetchApplications();
+    }
+  }, [user, isAdmin]);
 
   const fetchApplications = async () => {
+    if (!user) return; 
+  
     try {
-      const response = await axios.get('https://pet-adoption-api-v2.vercel.app/applications');
+      const url = isAdmin
+        ? "https://pet-adoption-api-v2.vercel.app/applications" // Fetch all applications for admin
+        : `https://pet-adoption-api-v2.vercel.app/applications?id=${user.id}`; // Fetch only user's applications
+  
+      const response = await axios.get(url);
       setApplications(response.data.data);
     } catch (error) {
-      console.error('Error fetching applications:', error);
+      console.error("Error fetching applications:", error);
     }
   };
 
