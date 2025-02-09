@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Pagination, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Form, Pagination, Badge, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Accordion from 'react-bootstrap/Accordion';
 import '../App.css';
 
 const PetsListingPage = () => {
+  const [loading, setLoading] = useState(true);
   const [pets, setPets] = useState([]);
   const [filteredPets, setFilteredPets] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +24,7 @@ const PetsListingPage = () => {
     const fetchPets = async () => {
       try {
         const response = await axios.get(
-          'https://pet-adoption-api-v2.vercel.app/pets'
+          'https://pet-adoption-api-v2.vercel.app/pets?status=1'
         );
         const responseData = response.data.data;
 
@@ -33,8 +34,11 @@ const PetsListingPage = () => {
         }
       } catch (error) {
         console.error('Error fetching pet data:', error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchPets();
   }, []);
 
@@ -68,6 +72,10 @@ const PetsListingPage = () => {
       return updatedFilters;
     });
   };
+
+  if (loading) {
+    return <div className="loading-page d-flex justify-content-center align-items-center h-100"><Spinner animation="border" size="sm" /></div>;
+  }
 
   return (
     <div>

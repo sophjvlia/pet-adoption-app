@@ -21,6 +21,8 @@ const AdminPetsView = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(true);
   const [addLoading, setAddLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -66,6 +68,8 @@ const AdminPetsView = () => {
         }
       } catch (error) {
         console.error('Error fetching pet data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -129,7 +133,6 @@ const AdminPetsView = () => {
 
 
   const fetchBreedsBySpecies = async (species) => {
-    console.log(species);
     if (species.trim().toLowerCase() == 'dog') {
       try {
         const response = await axios.get(
@@ -248,11 +251,11 @@ const AdminPetsView = () => {
         }
       );
 
-      setPets([...pets, { ...response.data, id: response.data.id }]);
-      console.log(pets);
+      setPets([...pets, { ...response.data.data, id: response.data.data.id }]);
       setAddLoading(false);
       setShowAddModal(false);
       setSuccess(true);
+      setSuccessMessage('Pet added successfully');
       setShowSuccessModal(true);
 
       setFormData({
@@ -278,9 +281,14 @@ const AdminPetsView = () => {
     setEditLoading(true);
 
     try {
+      const updatedFormData = {
+        ...formData,
+        status: parseInt(formData.status, 10), 
+      };
+
       const response = await axios.put(
         `https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`,
-        formData,
+        updatedFormData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -291,7 +299,14 @@ const AdminPetsView = () => {
       setEditLoading(false);
       setShowEditModal(false);
       setSuccess(true);
+      setSuccessMessage('Pet added successfully');
       setShowSuccessModal(true);
+
+      setPets(
+        pets.map((pet) =>
+          pet.id === selectedPet.id ? { ...selectedPet, ...updatedFormData } : pet
+        )
+      );
 
       // Reset the form data
       setFormData({
@@ -310,80 +325,31 @@ const AdminPetsView = () => {
       setShowSuccessModal(true);
       console.error('Error during login:', error);
     }
-
-    setPets(
-      pets.map((pet) =>
-        pet.id === selectedPet.id ? { ...selectedPet, ...formData } : pet
-      )
-    );
-
-    setEditLoading(false);
-    setShowEditModal(false);
-    setFormData({
-      name: '',
-      species: '',
-      breed: '',
-      gender: '',
-      age: '',
-      description: '',
-      image: '',
-      status: '',
-    });
   };
 
-  // Delete pet
-  // const handleDeletePet = async (id) => {
-  //   if (window.confirm('Are you sure you want to delete this pet?')) {
-  //     try {
-  //       const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${id}`);
-  
-  //       // Reset the form data
-  //       setFormData({
-  //         name: '',
-  //         species: '',
-  //         breed: '',
-  //         gender: '',
-  //         age: '',
-  //         description: '',
-  //         image: '',
-  //         status: '',
-  //       });
-
-  //       fetchPets();
-  //     } catch (error) {
-  //       console.error('Error during login:', error);
-  //     }
-  //   }
-  // };
-
   // Open delete modal and store pet ID
-  const handleOpenDeleteModal = (id) => {
-    setSelectedPet(id);
+  const handleOpenDeleteModal = (pet) => {
+    setSelectedPet(pet);
     setShowDeleteModal(true);
   };
 
   // Handle pet deletion
   const handleDeletePet = async () => {
-    if (!selectedPet) return; // Prevent deletion if no pet is selected
-
+    if (!selectedPet) return;
     setDeleteLoading(true);
+
     try {
-      await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`);
+      const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/pets/${selectedPet.id}`);
 
-      // Reset form data
-      setFormData({
-        name: '',
-        species: '',
-        breed: '',
-        gender: '',
-        age: '',
-        description: '',
-        image: '',
-        status: '',
-      });
+      if (response.data.success) {
+        setShowDeleteModal(false);
 
-      fetchPets(); // Refresh pet list
-      setShowDeleteModal(false);
+        setPets(
+          pets.filter((pet) =>
+            pet.id !== selectedPet.id
+          )
+        );
+      }
     } catch (error) {
       console.error('Error deleting pet:', error);
     } finally {
@@ -410,6 +376,10 @@ const AdminPetsView = () => {
 
     setShowEditModal(true);
   };
+
+  if (loading) {
+    return <div className="loading-page d-flex justify-content-center align-items-center h-100"><Spinner animation="border" size="sm" /></div>;
+  }
 
   return (
     <Container>
@@ -484,6 +454,7 @@ const AdminPetsView = () => {
                         placeholder="Search by age"
                         value={filters.age}
                         onChange={handleFilterChange}
+                        min="0"
                       />
                     </Form.Group>
                   </Col>
@@ -562,13 +533,13 @@ const AdminPetsView = () => {
                   <td>
                     {(() => {
                       switch (pet.status) {
-                        case '1':
+                        case 1:
                           return 'Active';
-                        case '2':
+                        case 2:
                           return 'Pending Adoption';
-                        case '3':
+                        case 3:
                           return 'Adopted';
-                        case '0':
+                        case 0:
                           return 'Inactive';
                         default:
                           return 'Unknown Status';
@@ -585,7 +556,7 @@ const AdminPetsView = () => {
                     </Button>
                     <Button
                       variant="danger"
-                      onClick={() => handleOpenDeleteModal(pet.id)}
+                      onClick={() => handleOpenDeleteModal(pet)}
                     >
                       <FaTrash />
                     </Button>
@@ -664,6 +635,7 @@ const AdminPetsView = () => {
                 name="age"
                 value={formData.age}
                 onChange={handleInputChange}
+                min="0"
               />
               {errors.age && <div className="text-danger">{errors.age}</div>}
             </Form.Group>
@@ -886,8 +858,8 @@ const AdminPetsView = () => {
           <Modal.Title>{success ? 'Success' : 'Error'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {success
-            ? 'Pet added successful!'
+          {successMessage
+            ? successMessage
             : 'An error occurred. Please try again.'}
         </Modal.Body>
         <Modal.Footer>
@@ -908,7 +880,7 @@ const AdminPetsView = () => {
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={handleDeletePet} disabled={deleteLoading}>
+          <Button variant="danger" onClick={() => handleDeletePet()} disabled={deleteLoading}>
             {deleteLoading ? <Spinner animation="border" size="sm" /> : "Confirm"}
           </Button>
         </Modal.Footer>
