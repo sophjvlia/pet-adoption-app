@@ -19,7 +19,9 @@ const AdminApplicationsView = () => {
   const [applications, setApplications] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [actionType, setActionType] = useState(null); 
   const [success, setSuccess] = useState(false);
@@ -91,23 +93,31 @@ const AdminApplicationsView = () => {
     }
   };
 
-  const handleDeleteClick = (application) => {
+  const openDeleteApplicationModal = (application) => {
     setSelectedApplication(application);
-    setShowModal(true);
+    setShowDeleteModal(true);
   };
 
-  const handleDeleteApplication = async (id) => {
-    setActionType('deleteApplication'); 
+  const handleDeleteApplication = async () => {
+    if (!selectedApplication) return;
+
+    setDeleteLoading(true);
+  
     try {
-      const response = await axios.delete(`https://pet-adoption-api-v2.vercel.app/applications/${id}`);
-      
-      setApplications(applications.filter((app) => app.id !== id));
+      const response = await axios.delete(
+        `https://pet-adoption-api-v2.vercel.app/applications/${selectedApplication.id}`
+      );
+  
+      setApplications((prevApps) => prevApps.filter((app) => app.id !== selectedApplication.id));
       setSuccess(true);
-      setShowStatusModal(true);
     } catch (error) {
       console.error('Error deleting application:', error);
-      setSuccess(false); 
+      setSuccess(false);
+    } finally {
+      setDeleteLoading(false);
       setShowStatusModal(true);
+      setShowDeleteModal(false);
+      setSelectedApplication(null);
     }
   };
 
@@ -205,7 +215,7 @@ const AdminApplicationsView = () => {
                         </Button>
                         <Button
                           variant="danger"
-                          onClick={() => handleDeleteApplication(application.id)}
+                          onClick={() => openDeleteApplicationModal(application)}
                         >
                           <FaTrash />
                         </Button>
@@ -477,6 +487,23 @@ const AdminApplicationsView = () => {
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowStatusModal(false)}>
             Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Application</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this application? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={deleteLoading}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={() => handleDeleteApplication()} disabled={deleteLoading}>
+            {deleteLoading ? <Spinner animation="border" size="sm" /> : "Confirm"}
           </Button>
         </Modal.Footer>
       </Modal>
